@@ -1,0 +1,57 @@
+Notes from udemy course: 
+    Create an advanced REST API with Python, Django REST Framework and 
+    Docker using Test Driven Development (TDD) by Mark Winterbottom
+
+
+Github & Dockerhub binding
+    1. In docker hub
+        - Account (icon) --> Account Settings --> Personal access tokens --> Generate new token
+        - Copy new token
+    2. In Github
+        - Settings --> Security --> Secrets and Variables --> Codespaces secrets 
+        --> New repository secret 
+            - Give a name to name field
+            - Add your  <your docker hub user name> 
+
+        - Settings --> Security --> Secrets and Variables --> Codespaces secrets 
+        --> New repository secret 
+            - paste you docker hub key into secret field 
+        
+
+
+Docker compose:
+    - command: ==> if we do not specify a command while running the docker-compose file (e.i: docker compose run sh ...) this 
+        command gets executed
+
+
+For Linting:
+    - Create requirements.dev.txt file
+    - add 
+        flake8>=3.9.2,<3.10
+    - copy this file in dockerfile along with the normal reqs file
+    - add a args: DEV=true flag in the compose file (under build:) (this means that if we run the server with this
+        compose file we are in the development mode)
+    - to default the mode to production add "ARG DEV=false" in dockerfile (compose file overrides this default value)
+    - create a .flake8 config file inside the project (not the root directory but the project)
+        [flake8]
+        exclude = 
+            migrations,
+            __pycache__,
+            manage.py,
+            setting.py
+    - to run flake8
+        docker compose run --rm app sh -c "flake8"
+
+Github actions:
+    - Similar to:
+        - Travis-CI
+        - GitLab CI/CD
+        - Jenkins
+    - Common uses:
+        - Deployment
+        - Code linting
+        - Unit test
+    1. Create a .github folder in root directory
+    2. Create a directory named workflows in .github directory
+    3. Create a yml file in workflows dir (e.g. checks.yml)
+    4. Add your jobs in this file (see example in )
