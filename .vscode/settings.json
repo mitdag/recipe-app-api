@@ -1,0 +1,31 @@
+
+{
+    "editor.fontSize": 15,
+    "terminal.integrated.fontSize": 15,
+    "window.zoomLevel": 1.3,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.autoComplete.addBrackets": true,
+    "emmet.includeLanguages": {
+        "django-html": "html",
+        "jinja-html": "html",
+         "css": "css"
+    },
+    "files.associations": {
+        "*.css": "css"
+    },
+    "cSpell.language": "en", // Set the language for spell checking
+    "cSpell.enabled": true, // Enable spell checking
+    "cSpell.checkStrings": true, // Check strings in your code
+    "cSpell.checkComments": true, // Check comments in your code
+    "cSpell.checkIdentifiers": true, // Check variable and function names
+    "cSpell.ignoreWords": [
+        "django",
+        "jinja",
+        "pylance",
+        "FastAPI" // Add any custom words you don’t want flagged
+    ],
+    "cSpell.words": [
+        "probobly"
+    ]
+}

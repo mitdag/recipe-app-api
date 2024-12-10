@@ -4,17 +4,20 @@ Notes from udemy course:
 
 
 Github & Dockerhub binding
+    Unauthenticated users can download 100 images per 6 hours form Docker Hub. For authenticated
+    users this number is 200. To get this advantage we need to let github login to our Docker Hub
+    account. To do this we need to set up our Docker Hub credentials on github:
+     
     1. In docker hub
         - Account (icon) --> Account Settings --> Personal access tokens --> Generate new token
         - Copy new token
     2. In Github
-        - Settings --> Security --> Secrets and Variables --> Codespaces secrets 
-        --> New repository secret 
+        - Settings --> Security --> Secrets and Variables --> Actions --> New repository secret 
             - Give a name to name field
             - Add your  <your docker hub user name> 
 
-        - Settings --> Security --> Secrets and Variables --> Codespaces secrets 
-        --> New repository secret 
+        - Settings --> Security --> Secrets and Variables -->  New repository secret 
+            - Give a name to secret field
             - paste you docker hub key into secret field 
         
 
@@ -55,3 +58,69 @@ Github actions:
     2. Create a directory named workflows in .github directory
     3. Create a yml file in workflows dir (e.g. checks.yml)
     4. Add your jobs in this file (see example in )
+
+Testing & Test Driven Development (TDD)
+    - Django test framework 
+        - unittest library
+        - Django adds features on top of it
+            - test client --> dummy web browser
+            - simulate authentication
+            - temp db
+        - Django Framework adds on top of it
+            - API test client
+    
+    - Test modules in project structure
+        - Each app has to have a tests.py file or tests/ directory (not both!)
+
+            project
+                |
+                |____app_1
+                |       |
+                |       |___tests.py
+                |
+                |
+                |____app_2
+                        |
+                        |___tests
+                                |
+                                |___ __init__.py
+                                |
+                                |___test_module_1.py
+                                |
+                                |___test_module_2.py
+                
+
+        - If you use tests/ directory each module in this directory must have a test_ prefix
+        - Test directories must have a __init__.py file inside
+
+    - There cases:
+        - SimpleTestCase
+            - No db
+        - SimpleTestCase    
+            - With db 
+
+    - TDD
+        - Create a test file (.py) for the module
+        - Import django.test.SimpleTestCase or TestCase
+        - Define a class extending from Simple/TestCase
+        - Define a test function for the feature you are planning to implement (ex: test_add_numbers)
+        - Run the test (most probobly you will get a "function not implemented" error (ex: add_numbers). Thus
+            the first implement the function and continue the following steps.)
+        - Fix the errors
+        - Did the test failed, go to 2 steps above 
+    
+    - Mocking
+        - Use unittest.mock library
+            - Magic / MagicMock --> Replaces real objects
+            - patch --> Overrides the code for test
+
+    - Testing APIs 
+        - Use Django APIClient (from rest_framework.test)
+
+            client = APIClient()
+            res = client.get("/greetings")
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.data, ["hello"], ["Bonjour"])
+
+
+    
