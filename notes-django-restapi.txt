@@ -123,4 +123,29 @@ Testing & Test Driven Development (TDD)
             self.assertEqual(res.data, ["hello"], ["Bonjour"])
 
 
+Database 
+    - When we start the project with docker compose, we might have a sync problem between app and db: 
+        As soon as app finishes its startup, it tries to connect the db. However at this minute db might
+        be starting up, thus app cannot connect and crashes. To overcome this app must have a wait status
+        after startup.
+    
+    - Create a management command. Management commands has a specific directory structure and django
+        understands if a module is management command by looking at this structure
+
+            project
+                |
+                |
+                |____core
+                        |
+                        |___management
+                                |
+                                |___ __init__.py
+                                |
+                                |___commands
+                                        |
+                                        |___ __init__.py
+                                        |
+                                        |____ wait_for_db.py
+
+
     
