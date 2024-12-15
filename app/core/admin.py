@@ -1,3 +1,75 @@
-from django.contrib import admin # noqa
+from django.contrib import admin
 
-# Register your models here.
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+
+from django.utils.translation import gettext_lazy as _
+
+from core import models
+
+
+class UserAdmin(BaseUserAdmin):
+    """ Define the admin pages for users """
+    list_display = ["email", "name"]
+    ordering = ["id"]
+    readonly_fields = ["last_login"]
+    fieldsets = (
+        (None, {"fields": ("email", "name")}, ),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser"
+                )
+            }
+        ),
+        (
+            _("Important Dates", ),
+            {
+                "fields": (
+                    "last_login",
+                )
+            }
+        )
+    )
+
+    # add_fieldsets = (
+    #     (None, {
+    #         # this makes the spaces btw labels and textfields wide
+    #         "classes": ("wide", ),
+    #         "fields": (
+    #             "email",
+    #             "password1",
+    #             "password2",
+    #             "name",
+    #             "is_active",
+    #             "is_staff",
+    #             "is_superuser"
+    #         )
+    #     })
+    #     ,)
+
+    # instead of tuples lists can also be used
+    add_fieldsets = [
+        [None,
+         {
+             # this makes the spaces btw labels and textfields wide
+             "classes": ["wide"],
+             "fields": [
+                 "email",
+                 "password1",
+                 "password2",
+                 "name",
+                 "is_active",
+                 "is_staff",
+                 "is_superuser"
+             ]
+         }
+         ]
+    ]
+
+
+admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Recipe)
+admin.site.register(models.Tag)
