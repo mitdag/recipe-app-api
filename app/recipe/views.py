@@ -2,6 +2,13 @@
 Views for recipe APIs
 """
 
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema,
+    OpenApiParameter,
+    OpenApiTypes,
+) 
+
 from rest_framework import (
     viewsets,
     mixins,
@@ -22,6 +29,31 @@ from core.models import (
 from recipe import serializers
 
 
+# This decorator is used for query parameter configuration
+# It allows us to extend auto generated schemas by drf-spectacular
+# Query param schemas are not generated automatically, thus we add them here.
+@extend_schema_view(
+    # This means we want to extend schema for list endpoint
+    list=extend_schema(
+        parameters=[
+            # Specifies the details of the parameter
+            OpenApiParameter(
+                # name of the param 
+                'tags',
+                # type of the param is string (we are expecting a string which contains 
+                # list of ids separated by commas )
+                OpenApiTypes.STR,
+                # For documentation
+                description='Comma separated list of tag IDs to filter',
+            ),
+            OpenApiParameter(
+                'ingredients',
+                OpenApiTypes.STR,
+                description='Comma separated list of ingredient IDs to filter',
+            ),
+        ]
+    )
+)
 # ModelViewSet is very convenient for directly working with models
 class RecipeViewSet(viewsets.ModelViewSet):
     """View for managing recipe APIs"""
@@ -34,10 +66,35 @@ class RecipeViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    # This is a helper function to convert query params to ints 
+    def _params_to_ints(self, qs):
+        """Convert a list of strings to integers."""
+        # query parameters are id numbers that are placed in a string and separated  with commas
+        # exp: '4,2,5'
+        return [int(str_id) for str_id in qs.split(',')]
+
     # Without this method overridden default queryset will return everything
     # With this method we customize how it behaves
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user).order_by("-id")
+        # This was the original implementation of the method which does not take the 
+        # query params into account.
+        # return self.queryset.filter(user=self.request.user).order_by("-id")
+        
+        tags = self.request.query_params.get('tags')
+        ingredients = self.request.query_params.get('ingredients')
+        queryset = self.queryset
+        if tags:
+            tag_ids = self._params_to_ints(tags)
+            queryset = queryset.filter(tags__id__in=tag_ids)
+        if ingredients:
+            ingredient_ids = self._params_to_ints(ingredients)
+            queryset = queryset.filter(ingredients__id__in=ingredient_ids)
+
+        # We use distinct here because we could get duplicate results if an ingredient or tag 
+        # assigned to the recipe
+        return queryset.filter(
+            user=self.request.user
+        ).order_by('-id').distinct()
     
     # We override this method the switch between serializers (RecipeSerializer or
     # RecipeDetailSerializer) according to the request. If the request is a listing
@@ -80,6 +137,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'assigned_only',
+                OpenApiTypes.INT, enum=[0, 1],
+                description='Filter by items assigned to recipes.',
+            ),
+        ]
+    )
+)
 # Order in the inheritance is important here: First mixin than GenericViewSet
 class BaseRecipeAttrViewSet(
         mixins.DestroyModelMixin,
@@ -92,7 +161,16 @@ class BaseRecipeAttrViewSet(
 
     def get_queryset(self):
         """Filter queryset to authenticated user."""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
+        assigned_only = bool(
+                int(self.request.query_params.get("assigned_only", 0))
+            )
+        queryset = self.queryset
+        if assigned_only:
+            queryset = queryset.filter(recipe__isnull=False)
+
+        return queryset.filter(
+                user=self.request.user
+            ).order_by('-name').distinct()
 
     
 
