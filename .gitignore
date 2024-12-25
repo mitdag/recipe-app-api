@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 
 notes-django-restapi.txt
+requirements.for-vscode.txt
+notes-django-restapi.txt

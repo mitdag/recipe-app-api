@@ -127,7 +127,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+
+# Base static url
+STATIC_URL = '/static/static/'
+# Base media url
+MEDIA_URL = '/static/media/'
+
+# Path to static files on the file system (root directory on 
+# the server storing these files)
+STATIC_ROOT = '/vol/web/static'
+# Path to media on the file system (root directory on 
+# the server storing these files)
+MEDIA_ROOT = '/vol/web/media'
+
+# This make it possible to upload images through browseable interface
+SPECTACULAR_SETTINGS = {
+    'COMPONENT_SPLIT_REQUEST': True,
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

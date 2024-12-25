@@ -13,11 +13,13 @@ ARG DEV=false
 
 RUN python -m venv /py && \ 
     /py/bin/pip install --upgrade pip && \
-    # These are need to compile and install psycopg2 (it is source code version, for psycopg2-binary 
-    # we do not need to install these)
-    apk add --update --no-cache postgresql-client && \
+    # These are needed to compile and install psycopg2 (it is source code version, for 
+    # psycopg2-binary we do not need to install these)
+    # (Psycopg is the most popular PostgreSQL database adapter for the Python)
+    # jpeg-dev is a dependency for Pillow (Python imaging library)
+    apk add --update --no-cache postgresql-client jpeg-dev && \
     apk add --update --no-cache --virtual .tmp-build-deps \
-        build-base postgresql-dev musl-dev && \
+        build-base postgresql-dev musl-dev zlib zlib-dev && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ $DEV = true ]; \
         then /py/bin/pip install -r /tmp/requirements.dev.txt; \
@@ -29,7 +31,14 @@ RUN python -m venv /py && \
     adduser \
         --disabled-password \
         --no-create-home \
-        django-user
+        django-user && \
+        # these directories will be used for static files and images
+        mkdir -p /vol/web/media && \
+        mkdir -p /vol/web/static && \
+        chown -R django-user:django-user /vol && \
+        # django-user and users in django-user group can make any changes in /vol (755)
+        chmod -R 755 /vol
+        
 ENV PATH="/py/bin:$PATH"
 
 USER django-user

@@ -10,6 +10,8 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app
+      # This will be used for image and static files
+      - dev-static-data:/vol/web
     # We do not want to run makemigrations each time the server runs.
     # It is better to make migrations on the terminal. Thus in the following 
     # command there no "python manage.py makemigrations" 
@@ -28,7 +30,7 @@ services:
     image: postgres:13-alpine
     volumes:
       # /var/lib/postgres/data is the default location for postgres db. 
-      - dev-db-data:/var/lib/postgres/data
+      - dev-db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=devdb
       - POSTGRES_USER=devuser
@@ -36,3 +38,4 @@ services:
 
 volumes:
   dev-db-data:
+  dev-static-data:
