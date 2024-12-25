@@ -18,14 +18,20 @@ from recipe.serializers import IngredientSerializer
 
 INGREDIENTS_URL = reverse("recipe:ingredient-list")
 
+
 def create_user(email="test@example.com", password="password123"):
-    return get_user_model().objects.create_user(email=email, password=password) # type: ignore
+    return get_user_model().objects.create_user(
+        email=email, password=password
+    )  # type: ignore
+
 
 def create_ingredient(user, name="Test Ingredient"):
     return Ingredient.objects.create(name=name, user=user)
 
+
 def ingredient_details_url(ingredient_id):
     return reverse("recipe:ingredient-detail", args=[ingredient_id])
+
 
 class PublicIngredientApiTests(TestCase):
     """Test for public functionalities of ingredients api"""
@@ -39,7 +45,7 @@ class PublicIngredientApiTests(TestCase):
         res = self.client.get(INGREDIENTS_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
-        
+
 
 class PrivateIngredientApiTests(TestCase):
     """Tests for private functionalities of ingredients api"""
@@ -80,7 +86,7 @@ class PrivateIngredientApiTests(TestCase):
 
         ingredient = create_ingredient(name="Vanilla", user=self.user)
         payload = {
-            "name":"Salt",
+            "name": "Salt",
             "user": self.user
         }
 
@@ -96,16 +102,17 @@ class PrivateIngredientApiTests(TestCase):
 
         res = self.client.delete(ingredient_details_url(ingredient.id))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
-        
+
         ingredients = Ingredient.objects.filter(user=self.user)
         self.assertFalse(ingredients.exists())
-        
+
     def test_create_ingredient(self):
-        # We test this functionality in recipe tests because this is the normal use of the 
-        # system: when users create a new recipe they create new ingredients or use existing ones.
+        # We test this functionality in recipe tests because this is the
+        # normal use of the system: when users create a new recipe they
+        # create new ingredients or use existing ones.
         pass
 
-# ===================================== TEST FILTERING (QUERY PARAMS) ====================================
+# ===================================== TEST FILTERING (QUERY PARAMS
 
     # We test here that only those ingredients which are assigned to a recipe
     # is returned from the endpoint
@@ -120,14 +127,14 @@ class PrivateIngredientApiTests(TestCase):
             user=self.user,
         )
         recipe.ingredients.add(in1)
-        # 1 in {'assigned_only': 1} means true 
+        # 1 in {'assigned_only': 1} means true
         res = self.client.get(INGREDIENTS_URL, {'assigned_only': 1})
 
         s1 = IngredientSerializer(in1)
         s2 = IngredientSerializer(in2)
         self.assertIn(s1.data, res.data)
-        # We expect to get only those ingredients that are assigned to a recipe. Thus 
-        # ingredient 2 must not be in the response
+        # We expect to get only those ingredients that are assigned to a
+        # recipe. Thus ingredient 2 must not be in the response
         self.assertNotIn(s2.data, res.data)
 
     # We test here that the returning list includes only distinct values

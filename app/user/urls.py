@@ -6,7 +6,7 @@ from django.urls import path
 
 from user import views
 
-# This app name will be used in reverse function 
+# This app name will be used in reverse function
 # (e.g CREATE_USER_URL = reverse("user:create") in tests/test_user_api.py)
 app_name = "user"
 

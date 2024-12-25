@@ -28,7 +28,8 @@ class ModelTests(TestCase):
         email = "test@example.com"
         password = "password"
 
-        user = get_user_model().objects.create_user(email=email, password=password) # type: ignore
+        user = get_user_model().objects.create_user(
+            email=email, password=password)  # type: ignore
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
@@ -44,32 +45,34 @@ class ModelTests(TestCase):
         ]
 
         for email, expected in emails:
-            user = get_user_model().objects.create_user(email=email, password="password") # type: ignore
+            user = get_user_model().objects.create_user(
+                email=email, password="password")  # type: ignore
 
             self.assertEqual(user.email, expected)
 
     def test_new_user_without_email_raises_error(self):
         with self.assertRaises(expected_exception=ValueError):
-            get_user_model().objects.create_user(email="", password="password") # type: ignore
+            get_user_model().objects.create_user(
+                email="", password="password")  # type: ignore
 
     def test_create_super_user(self):
         user = get_user_model().objects.create_superuser(
             email="superuser@test.com",
             password="password"
-        ) # type: ignore
+        )  # type: ignore
 
         self.assertEqual(user.email, "superuser@test.com")
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS RECIPE ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS RECIPE
     def test_create_recipe(self):
         """ Test creating a recipe is successful """
 
         user = get_user_model().objects.create_user(
             email="test@example.com",
             password="password123"
-        ) # type: ignore
+        )  # type: ignore
 
         recipe = models.Recipe.objects.create(
             user=user,
@@ -82,7 +85,7 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(recipe), recipe.title)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS TAG ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS TAG
     def test_create_tag(self):
         """Test creating a tag is successful."""
         user = create_user()
@@ -90,8 +93,8 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(tag), tag.name)
 
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS INGREDIENT
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS INGREDIENT ++++++++++++++++++++++++++++++++++++++++++++++++++
     def test_create_ingredient(self):
         """Test creating an ingredient is successful"""
         user = create_user()
@@ -100,7 +103,7 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(ingredient), name)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS IMAGE FILE PATH +++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++ TESTS IMAGE FILE PATH
 
     @patch('core.models.uuid.uuid4')
     def test_recipe_file_name_uuid(self, mock_uuid):

@@ -20,6 +20,7 @@ from recipe.serializers import TagSerializer
 
 TAGS_URL = reverse('recipe:tag-list')
 
+
 def tag_detail_url(tag_id):
     """Create and return a tag detail url."""
     return reverse('recipe:tag-detail', args=[tag_id])
@@ -27,7 +28,9 @@ def tag_detail_url(tag_id):
 
 def create_user(email='user@example.com', password='testpass123'):
     """Create and return a user."""
-    return get_user_model().objects.create_user(email=email, password=password) # type: ignore
+    return get_user_model().objects.create_user(
+        email=email, password=password
+    )  # type: ignore
 
 
 class PublicTagsApiTests(TestCase):
@@ -76,7 +79,6 @@ class PrivateTagsApiTests(TestCase):
         self.assertEqual(res.data[0]['name'], tag.name)
         self.assertEqual(res.data[0]['id'], tag.id)
 
-
     def test_update_tag(self):
         """Test updating a tag."""
         tag = Tag.objects.create(user=self.user, name='After Dinner')
@@ -88,7 +90,6 @@ class PrivateTagsApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         tag.refresh_from_db()
         self.assertEqual(tag.name, payload['name'])
-
 
     def test_delete_tag(self):
         """Test deleting a tag."""
@@ -102,15 +103,16 @@ class PrivateTagsApiTests(TestCase):
         self.assertFalse(tags.exists())
 
     def test_create_new_tag(self):
-        # We test this functionality in recipe tests because this is the normal use of the 
-        # system: when users create a new recipe they create new tags or use existing ones.
+        # We test this functionality in recipe tests because this is
+        #  the normal use of the system: when users create a new recipe
+        # they create new tags or use existing ones.
         pass
 
-
-    # ===================================== TEST FILTERING (QUERY PARAMS) ====================================
+    # ===================================== TEST FILTERING (QUERY PARAMS)
 
     # We test here that only those tags which are assigned to a recipe
     # is returned from the endpoint
+
     def test_filter_tags_assigned_to_recipes(self):
         """Test listing tags to those assigned to recipes."""
         tag1 = Tag.objects.create(user=self.user, name='Breakfast')
@@ -122,13 +124,13 @@ class PrivateTagsApiTests(TestCase):
             user=self.user,
         )
         recipe.tags.add(tag1)
-        # 1 in {'assigned_only': 1} means true 
+        # 1 in {'assigned_only': 1} means true
         res = self.client.get(TAGS_URL, {'assigned_only': 1})
 
         s1 = TagSerializer(tag1)
         s2 = TagSerializer(tag2)
         self.assertIn(s1.data, res.data)
-        # We expect to get only those tags that are assigned to a recipe. Thus 
+        # We expect to get only those tags that are assigned to a recipe. Thus
         # tag 2 must not be in the response
         self.assertNotIn(s2.data, res.data)
 

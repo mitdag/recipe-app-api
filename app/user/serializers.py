@@ -4,12 +4,11 @@ Serializers for the user API View
 
 from django.contrib.auth import (
     get_user_model,
-    authenticate # this is used for token serialization
+    authenticate  # this is used for token serialization
 )
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
-
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,17 +24,16 @@ class UserSerializer(serializers.ModelSerializer):
         # response. Thus we make password field as write_only
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
-
     def create(self, validated_data):
         """Create and return a user with encrypted password """
-        return get_user_model().objects.create_user(**validated_data)   
-    
+        return get_user_model().objects.create_user(**validated_data)
 
     def update(self, instance, validate_data):
         """ Update and return user """
 
-        # We make the password update optional for the user. If he specifies one 
-        # we update it, do not touch the current password otherwise
+        # We make the password update optional for the user. If he
+        # specifies one we update it, do not touch the current
+        # password otherwise
         password = validate_data.pop("password", None)
 
         user = super().update(instance, validate_data)
@@ -45,17 +43,19 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
         return user
 
+
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(
-        # When we are using browseable api we want the password to be hidden
+        # When we are using browseable api we want the
+        # password to be hidden
         style={"input_type": "password"},
-        # Django rest_framework's default behavior is to trim whitespace from char inputs 
-        # we do not want it, because user can be able to add whitespaces in his password
+        # Django rest_framework's default behavior is to trim
+        # whitespace from char inputs we do not want it, because
+        # user can be able to add whitespaces in his password
         trim_whitespace=False,
     )
 
-    
     def validate(self, attrs):
         """ Validate and authenticate the user """
         email = attrs.get("email")
@@ -70,6 +70,6 @@ class AuthTokenSerializer(serializers.Serializer):
         if not user:
             msg = _("Unable to authenticate with the provided credentials")
             raise serializers.ValidationError(msg, code="authorization")
-        
+
         attrs["user"] = user
         return attrs

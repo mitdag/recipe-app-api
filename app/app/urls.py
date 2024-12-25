@@ -36,8 +36,8 @@ urlpatterns = [
     path("api/recipe/", include("recipe.urls"))
 ]
 
-# We want to use Django development service to manipulate 
-# these file only in development mode 
+# We want to use Django development service to manipulate
+# these file only in development mode
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,

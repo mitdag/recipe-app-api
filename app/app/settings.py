@@ -133,10 +133,10 @@ STATIC_URL = '/static/static/'
 # Base media url
 MEDIA_URL = '/static/media/'
 
-# Path to static files on the file system (root directory on 
+# Path to static files on the file system (root directory on
 # the server storing these files)
 STATIC_ROOT = '/vol/web/static'
-# Path to media on the file system (root directory on 
+# Path to media on the file system (root directory on
 # the server storing these files)
 MEDIA_ROOT = '/vol/web/media'
 
@@ -153,5 +153,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
-                'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-            }
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}

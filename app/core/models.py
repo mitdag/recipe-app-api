@@ -5,30 +5,29 @@ import uuid
 import os
 
 from django.conf import settings
-from django.db import models 
-
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin
 )
-from django.utils import translation as _
+
 
 def recipe_image_file_path(instance, filename):
     """Generate a file path for new recipe image"""
     ext = os.path.splitext(filename)[1]
     filename = f"{uuid.uuid4()}{ext}"
-    
+
     # instead of creating the path manually (i.e. /uploads/recipe/{filename})
-    # use os.path.join to overcome differences btw oses. 
+    # use os.path.join to overcome differences btw oses.
     return os.path.join("uploads", "recipe", filename)
+
 
 class UserManager(BaseUserManager):
     """ Manager for users """
 
     # password is defaulted to None here. This gives flexibility to create
-    # unusable users (for testing etc.) 
+    # unusable users (for testing etc.)
     def create_user(self, email, password=None, **extra_fields):
         """ Create, save and return a new user """
         if not email:
@@ -45,9 +44,9 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
-        
+
         return user
-        
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """ Users in the system"""
@@ -67,9 +66,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Recipe(models.Model):
     """ Recipe object """
     user = models.ForeignKey(
-        # We could use here directly a string here. However it is best practice 
-        # to make it dynamic so that we do not need to change code here if we 
-        # need to change user model 
+        # We could use here directly a string here. However it is best practice
+        # to make it dynamic so that we do not need to change code here if we
+        # need to change user model
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
@@ -82,10 +81,9 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField("Ingredient")
     image = models.ImageField(null=True, upload_to=recipe_image_file_path)
 
-
     def __str__(self):
         return self.title
-    
+
 
 class Tag(models.Model):
     """Tag for filtering recipes."""
@@ -97,16 +95,12 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    
-    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+
     def __str__(self):
         return self.name
-   
-
-
-
